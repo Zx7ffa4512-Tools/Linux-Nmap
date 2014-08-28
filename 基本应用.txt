@@ -1,0 +1,113 @@
+一。参数
+#nmap [扫描方式] [命令选项] {目标}
+
+
+{目标}格式：
+    IPv4 地址： 192.168.1.1
+    IPv6 地址：AABB:CCDD::FF%eth0
+    主机名：www.target.tgt
+    IP 地址范围：192.168.0-255.0-255
+    掩码格式：192.168.0.0/16
+    使用列表文件：-iL <filename>
+
+[命令选项]:
+  扫描端口
+    无端口范围时扫描1000 个常用端口
+    -F                          扫描100个最常用端口
+    -p<port1>-<port2>           指定端口范围
+    -p<port1>,<port2>,…         端口列表
+    -pU:53,U:110,T20-445        TCP&UDP结合
+    -r                          线性扫描（不是随机扫描）
+    –top-ports <n>              扫描n个最常用端口
+    -p-65535                    忽略初始端口，nmap从端口1开始扫描
+    -p0-                        忽略结束端口，nmap扫描至65535端口
+    -p-                         扫描0-65535端口
+  脚本引擎
+    -sC 运行默认脚本
+    –script=<ScriptName>
+     运行个人脚本或批量脚本
+    –script-args=<Name1=value1,…>
+     使用脚本参数列表
+    –script-updatedb
+     更新脚本数据库
+  深入扫描命令
+    -Pn  不探测扫描（假定所有主机都存活）
+    -PB  默认探测扫描（探测端口：TCP 80，445&ICMP）
+    -PS<portlist>  tcp探测扫描
+    -PE  ICMP Echo Request
+    -PP  ICMP Timestamp Request
+    -PM  ICMP Netmask Request
+  
+  
+[扫描类型]
+    -sP         只探测主机在线情况
+    -sS         SYN扫描（隐身扫描）
+    -ST         TCP扫描
+    -sU         UDP扫描
+    -sV         系统版本检测
+    -O          操作系统识别
+    –scanflags  指定TCP标识位（设置URG, ACK, PSH,RST,SYN,FIN位）
+  细粒度的时间选项
+    –min-hostgroup/max-hostgroup <size>                           平行的主机扫描组的大小
+    –min-parallelism/max-parallelism <numprobes>                  并行探测
+    –min-rtt-timeout/max-rtttimeout/initial-rtt-timeout <time>    指定每轮探测的时间
+    –max-retries <tries>                                          扫描探测的上限次数设定
+    –host-timeout <time>                                          设置timeout时间
+    –scan-delay/–max-scan-delay <time>                            调整两次探测之间的延迟
+    –min-rate <number>                                            每秒发送数据包不少于<number>次
+    
+  时序选项
+    -T0  偏执的：非常非常慢，用于IDS逃逸
+    -T1  猥琐的：相当慢，用于IDS逃逸
+    -T2  有礼貌的：降低速度以消耗更小的带宽，比默认慢十倍
+    -T3  普通的：默认，根据目标的反应自动调整时间模式
+    -T4  野蛮的：假定处在一个很好的网络环境，请求可能会淹没目标
+    -T5  疯狂的：非常野蛮，很可能会淹没目标端口或是漏掉一些开放端口
+  
+  输出格式
+    -oN             标准输出
+    -oG             好理解的格式
+    -ox             xml格式 
+    -oA<basename>   用<basename>生成以上格式的文件 
+    
+  misc选项
+    -n  禁止反向IP地址查找
+    -6  只是用 IPv6
+    -A  是用几个命令：OS 探测，版本探测，脚本扫描，traceroute
+    –reason 列出nmap的判断：端口开放，关闭，被过滤。
+
+
+二。实例
+
+1、Nmap 默认发送一个arp的ping数据包，来探测目标主机在1-10000范围内所开放的端口
+  nmap 10.1.1.254
+
+2、Nmap 简单扫描，并对返回的结果详细描述输出，-vv 参数设置对结果的详细输出。
+  nmap -vv 10.1.1.254
+  
+3、扫描目标主机1-50号端口
+  nmap -p1-50 10.1.1.254
+  
+4、nmap 指定端口扫描
+  nmap -p80,443,22,21,8080,25,53 10.1.1.254
+  
+5、nmap ping 扫描，sP 设置扫描方式为ping扫描
+  nmap -sP 10.1.1.254
+  
+6、nmap 路由跟踪
+  nmap --traceroute 8.8.8.8
+
+7、nmap 还可以设置扫描一个网段下的ip
+  nmap -sP 10.1.1.0/24
+  nmap -sP 10.1.1.1-255
+  nmap -iL list.txt
+
+8、nmap 操作系统类型的探测
+  nmap -O 10.1.1.254
+  
+9、nmap 万能开关，选项设置包含了1-10000的端口ping扫描，操作系统扫描，脚本扫描，路由跟踪，服务探测
+  nmap -A 10.1.1.254
+  
+10、nmap 命令混合式扫描
+  nmap -vv -p1-1000 -O 10.1.1.105
+  nmap -p80,8080,22,23 -traceroute -O 10.1.1.254
